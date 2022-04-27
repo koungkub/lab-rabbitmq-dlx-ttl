@@ -15,6 +15,12 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
+const (
+	exchangeName = "e-2"
+	queueName    = "q-2"
+	routingKey   = "*.*"
+)
+
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
@@ -27,12 +33,12 @@ func main() {
 		panic(err)
 	}
 
-	queue, err := ch.QueueDeclare("service", true, false, false, false, nil)
+	queue, err := ch.QueueDeclare(queueName, true, false, false, false, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := ch.QueueBind(queue.Name, "*.*", "e2", false, nil); err != nil {
+	if err := ch.QueueBind(queue.Name, routingKey, exchangeName, false, nil); err != nil {
 		log.Fatal(err)
 	}
 

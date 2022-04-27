@@ -15,6 +15,14 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
+const (
+	exchangeName = "e-1"
+	queueName    = "q-1"
+	routingKey   = "*.*"
+
+	dlxExchange = "e-dlx"
+)
+
 func init() {
 	rand.Seed(time.Now().UnixNano())
 }
@@ -28,15 +36,15 @@ func main() {
 	}
 
 	option := amqp.Table{
-		"x-dead-letter-exchange": "e-dlx",
+		"x-dead-letter-exchange": dlxExchange,
 	}
 
-	queue, err := ch.QueueDeclare("service", true, false, false, false, option)
+	queue, err := ch.QueueDeclare(queueName, true, false, false, false, option)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := ch.QueueBind(queue.Name, "*.*", "e2", false, option); err != nil {
+	if err := ch.QueueBind(queue.Name, routingKey, exchangeName, false, option); err != nil {
 		log.Fatal(err)
 	}
 

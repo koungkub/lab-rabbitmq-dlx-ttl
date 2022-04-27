@@ -14,6 +14,15 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
+const (
+	exchangeName = "e-dlx"
+	queueName    = "q-dlx"
+	routingKey   = "*.*"
+
+	dlxExchange = "e-1"
+	messageTTL  = 10000
+)
+
 func main() {
 	conn := connection.NewRabbitmq()
 
@@ -23,16 +32,16 @@ func main() {
 	}
 
 	option := amqp.Table{
-		"x-dead-letter-exchange": "e2",
-		"x-message-ttl":          10000,
+		"x-dead-letter-exchange": dlxExchange,
+		"x-message-ttl":          messageTTL,
 	}
 
-	queue, err := ch.QueueDeclare("q-dlx", true, false, false, false, option)
+	queue, err := ch.QueueDeclare(queueName, true, false, false, false, option)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := ch.QueueBind(queue.Name, "*.*", "e-dlx", false, option); err != nil {
+	if err := ch.QueueBind(queue.Name, routingKey, exchangeName, false, option); err != nil {
 		log.Fatal(err)
 	}
 
